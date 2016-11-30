@@ -402,3 +402,8 @@ void TimerLowPowerHandler( void )
         }
     }
 }
+
+void loraMacNodeInitTimers()
+{
+    TimerListHead = NULL;
+}
