@@ -1612,6 +1612,7 @@ GPIO_PBCLR |= PB1_MASK;
         bandwidth  = 1;
         symbTimeout = 14;
     }
+symbTimeout = 100;
     RxWindowSetup( Channels[Channel].Frequency, datarate, bandwidth, symbTimeout, false );
 #elif ( defined( USE_BAND_915 ) || defined( USE_BAND_915_HYBRID ) )
     datarate = datarateOffsets[LoRaMacParams.ChannelsDatarate][LoRaMacParams.Rx1DrOffset];
