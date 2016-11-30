@@ -849,6 +849,9 @@ LoRaMacStatus_t SendFrameOnChannel( ChannelParams_t channel );
  */
 static void ResetMacParameters( void );
 
+uint16_t loraMacRequestedDelay;
+uint32_t timestampStartDelay;
+
 static void OnRadioTxDone( void )
 {
     TimerTime_t curTime = TimerGetCurrentTime( );
@@ -872,6 +875,8 @@ static void OnRadioTxDone( void )
     {
         TimerSetValue( &RxWindowTimer1, RxWindow1Delay );
         TimerStart( &RxWindowTimer1 );
+loraMacRequestedDelay = RxWindow1Delay;
+timestampStartDelay = halCommonGetInt32uMillisecondTick();
         if( LoRaMacDeviceClass != CLASS_C )
         {
             TimerSetValue( &RxWindowTimer2, RxWindow2Delay );

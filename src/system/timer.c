@@ -197,6 +197,10 @@ static void TimerInsertNewHeadTimer( TimerEvent_t *obj, uint32_t remainingTime )
     TimerSetTimeout( TimerListHead );
 }
 
+extern uint16_t loraMacRequestedDelay;
+extern uint32_t timestampStartDelay;
+uint16_t loraMacActualDelayJoin, loraMacActualDelayDataUp;
+
 void TimerIrqHandler( void )
 {
     uint32_t elapsedTime = 0;
@@ -227,6 +231,16 @@ void TimerIrqHandler( void )
 
         if( elapsedTimer->Callback != NULL )
         {
+if (loraMacRequestedDelay == elapsedTimer->ReloadValue) {
+if (loraMacRequestedDelay > 3000) {
+    //JOIN REQUEST
+    loraMacActualDelayJoin = elapsedTimeInt16u(timestampStartDelay, halCommonGetInt32uMillisecondTick());
+}
+else {
+    //DATA UP
+    loraMacActualDelayDataUp = elapsedTimeInt16u(timestampStartDelay, halCommonGetInt32uMillisecondTick());
+}
+}
             elapsedTimer->Callback( );
         }
     }
