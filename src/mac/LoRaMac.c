@@ -875,6 +875,7 @@ static void OnRadioTxDone( void )
     {
         TimerSetValue( &RxWindowTimer1, RxWindow1Delay );
         TimerStart( &RxWindowTimer1 );
+GPIO_PBSET |= PB1_MASK;
 loraMacRequestedDelay = RxWindow1Delay;
 timestampStartDelay = halCommonGetInt32uMillisecondTick();
         if( LoRaMacDeviceClass != CLASS_C )
@@ -1577,6 +1578,7 @@ static void OnTxDelayedTimerEvent( void )
 
 static void OnRxWindow1TimerEvent( void )
 {
+GPIO_PBCLR |= PB1_MASK;
     uint16_t symbTimeout = 5; // DR_2, DR_1, DR_0
     int8_t datarate = 0;
     uint32_t bandwidth = 0; // LoRa 125 kHz
