@@ -1576,9 +1576,20 @@ static void OnTxDelayedTimerEvent( void )
     ScheduleTx( );
 }
 
+uint32_t loraMacActualDelayJoin, loraMacActualDelayDataUp;
+
 void OnRxWindow1TimerEvent( void )
 {
 GPIO_PBCLR |= PB1_MASK;
+if (loraMacRequestedDelay > 4000) {
+    //JOIN REQUEST
+    loraMacActualDelayJoin = elapsedTimeInt32u(timestampStartDelay, halCommonGetInt32uMillisecondTick());
+}
+else {
+    //DATA UP
+    loraMacActualDelayDataUp = elapsedTimeInt32u(timestampStartDelay, halCommonGetInt32uMillisecondTick());
+}
+
     uint16_t symbTimeout = 5; // DR_2, DR_1, DR_0
     int8_t datarate = 0;
     uint32_t bandwidth = 0; // LoRa 125 kHz
