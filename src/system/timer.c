@@ -199,7 +199,8 @@ static void TimerInsertNewHeadTimer( TimerEvent_t *obj, uint32_t remainingTime )
 
 extern uint16_t loraMacRequestedDelay;
 extern uint32_t timestampStartDelay;
-uint16_t loraMacActualDelayJoin, loraMacActualDelayDataUp;
+uint32_t loraMacActualDelayJoin, loraMacActualDelayDataUp;
+extern void OnRxWindow1TimerEvent( void );
 
 void TimerIrqHandler( void )
 {
@@ -231,14 +232,15 @@ void TimerIrqHandler( void )
 
         if( elapsedTimer->Callback != NULL )
         {
-if (loraMacRequestedDelay == elapsedTimer->ReloadValue) {
-if (loraMacRequestedDelay > 3000) {
+            
+if (elapsedTimer->Callback == OnRxWindow1TimerEvent) {
+if (loraMacRequestedDelay > 4000) {
     //JOIN REQUEST
-    loraMacActualDelayJoin = elapsedTimeInt16u(timestampStartDelay, halCommonGetInt32uMillisecondTick());
+    loraMacActualDelayJoin = elapsedTimeInt32u(timestampStartDelay, halCommonGetInt32uMillisecondTick());
 }
 else {
     //DATA UP
-    loraMacActualDelayDataUp = elapsedTimeInt16u(timestampStartDelay, halCommonGetInt32uMillisecondTick());
+    loraMacActualDelayDataUp = elapsedTimeInt32u(timestampStartDelay, halCommonGetInt32uMillisecondTick());
 }
 }
             elapsedTimer->Callback( );
@@ -417,7 +419,39 @@ void TimerLowPowerHandler( void )
     }
 }
 
+extern uint32_t RtcCalendarContext;
+
+void zeroTimer(TimerEvent_t *obj)
+{
+    obj->Timestamp = 0;
+    obj->ReloadValue = 0;
+    obj->IsRunning = false;
+    obj->Callback = NULL;
+    obj->Next = NULL;
+}
+
+extern TimerEvent_t MacStateCheckTimer;
+extern TimerEvent_t TxDelayedTimer;
+extern TimerEvent_t RxWindowTimer1;
+extern TimerEvent_t RxWindowTimer2;
+extern TimerEvent_t AckTimeoutTimer;
+extern TimerEvent_t TxTimeoutTimer;
+extern TimerEvent_t RxTimeoutTimer;
+extern TimerEvent_t RxTimeoutSyncWord;
 void loraMacNodeInitTimers()
 {
+    //Zero all existing timers and clear timer list
+    zeroTimer(&MacStateCheckTimer);
+    zeroTimer(&TxDelayedTimer);
+    zeroTimer(&RxWindowTimer1);
+    zeroTimer(&RxWindowTimer2);
+    zeroTimer(&AckTimeoutTimer);
+    zeroTimer(&TxTimeoutTimer);
+    zeroTimer(&RxTimeoutTimer);
+    zeroTimer(&RxTimeoutSyncWord);
     TimerListHead = NULL;
+    
+    //Zero all other state variables
+    HasLoopedThroughMain = 0;
+    RtcCalendarContext = 0;
 }

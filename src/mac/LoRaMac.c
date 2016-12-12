@@ -454,7 +454,7 @@ uint32_t LoRaMacState = LORA_MAC_IDLE;
 /*!
  * LoRaMac timer used to check the LoRaMacState (runs every second)
  */
-static TimerEvent_t MacStateCheckTimer;
+TimerEvent_t MacStateCheckTimer;
 
 /*!
  * LoRaMac upper layer event functions
@@ -474,13 +474,13 @@ static RadioEvents_t RadioEvents;
 /*!
  * LoRaMac duty cycle delayed Tx timer
  */
-static TimerEvent_t TxDelayedTimer;
+TimerEvent_t TxDelayedTimer;
 
 /*!
  * LoRaMac reception windows timers
  */
-static TimerEvent_t RxWindowTimer1;
-static TimerEvent_t RxWindowTimer2;
+TimerEvent_t RxWindowTimer1;
+TimerEvent_t RxWindowTimer2;
 
 /*!
  * LoRaMac reception windows delay
@@ -493,7 +493,7 @@ static uint32_t RxWindow2Delay;
 /*!
  * Acknowledge timeout timer. Used for packet retransmissions.
  */
-static TimerEvent_t AckTimeoutTimer;
+TimerEvent_t AckTimeoutTimer;
 
 /*!
  * Number of trials to get a frame acknowledged
@@ -589,7 +589,7 @@ static void OnTxDelayedTimerEvent( void );
 /*!
  * \brief Function executed on first Rx window timer event
  */
-static void OnRxWindow1TimerEvent( void );
+void OnRxWindow1TimerEvent( void );
 
 /*!
  * \brief Function executed on second Rx window timer event
@@ -1576,7 +1576,7 @@ static void OnTxDelayedTimerEvent( void )
     ScheduleTx( );
 }
 
-static void OnRxWindow1TimerEvent( void )
+void OnRxWindow1TimerEvent( void )
 {
 GPIO_PBCLR |= PB1_MASK;
     uint16_t symbTimeout = 5; // DR_2, DR_1, DR_0
