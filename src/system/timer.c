@@ -52,6 +52,7 @@ void TimerStart( TimerEvent_t *obj )
 void TimerStop( TimerEvent_t *obj )
 {
     removeFromList(obj);
+//printList();
 //emberAfPrintln(0xFFFF, "%s: Stopped timer %x", __func__, obj);
 //printList();
 }
@@ -85,6 +86,7 @@ void TimerIrqHandler( void )
     
     TimerEvent_t* cur = TimerListHead;
     
+//printList();
     //scan the entire list
     while (cur != NULL) {
         //store the relevant information of the current timer and move to the next one
@@ -93,20 +95,27 @@ void TimerIrqHandler( void )
         currentTimerExpiryTime = cur->ExpiryTime;
         currentTimerPointer = cur;
         cur = cur->Next;
-        
+//emberAfPrintln(0xFFFF, "%s: timer %x will expire at %X%X%X%X. Current time = %X%X%X%X", __func__, currentTimerPointer, currentTimerExpiryTime>>24, currentTimerExpiryTime>>16, currentTimerExpiryTime>>8, currentTimerExpiryTime,
+//                                                                                                                       currentTime>>24, currentTime>>16, currentTime>>8, currentTime);
         if (currentTime >= currentTimerExpiryTime) {
             //current timer has expired: time to perform its action
             currentTimerCallback();
             removeFromList(currentTimerPointer);
+//emberAfPrintln(0xFFFF, "%s: executed timer %x callback", __func__, currentTimerPointer);
+//printList();
         }
-        else {
-            //current timer has not yet expired: determine when the next timer event will occur
-            scheduleNewEvent = TRUE;
-            timeToEvent = currentTimerExpiryTime - currentTime;
-            if (timeToEvent < timeToNextEvent) {
-                timeToNextEvent = timeToEvent;
-            }
+    }
+    
+    //must loop through the list again because callback(s) may have introduced new timers
+    cur = TimerListHead;
+    while (cur != NULL) {
+        //current timer has not yet expired: determine when the next timer event will occur
+        scheduleNewEvent = TRUE;
+        timeToEvent = cur->ExpiryTime - currentTime;
+        if (timeToEvent < timeToNextEvent) {
+            timeToNextEvent = timeToEvent;
         }
+        cur = cur->Next;
     }
     
     if (scheduleNewEvent) {
